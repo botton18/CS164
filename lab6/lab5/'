@@ -1,0 +1,45 @@
+from check import ip_checksum
+import socket 
+import sys
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+except socket.error:
+    print 'Failed to create socket'
+    sys.exit()
+
+host = 'localhost';
+port = 8888;
+
+count = 0
+
+seq = 0
+packet = ''
+while(count < 11):
+    #msg = raw_input('Enter message to send: ')
+    msg = str(count)
+    checksum = ip_checksum(msg)
+    packet = seq + msg + checksum
+    try:
+        #set string
+        s.sendto(packet,(host,port))
+
+        #receive dat from client
+
+        d = s.recvfrom(1024)
+        reply = d[0]
+        addr = d[1]
+
+        print 'Server reply : ' + reply
+    
+    except socket.error,msg:
+        print 'Error sending msg'
+        sys.exit()
+
+    if seq == 0:
+        seq == 1
+    count = count + 1
+
+#Enter Message to send: hello
+#Server reply : OK....hello
+
